@@ -7,7 +7,14 @@
       "Bash(curl -s http://localhost:5173)",
       "Bash(curl -s http://localhost:5177)",
       "Bash(curl *)",
-      "Bash(xargs ls)"
+      "Bash(xargs ls)",
+      "Skill(vercel:deploy)",
+      "Bash(vercel --version)",
+      "Bash(git *)",
+      "Bash(vercel whoami *)",
+      "Bash(vercel link *)",
+      "Bash(vercel *)",
+      "Bash(grep *)"
     ]
   }
 }

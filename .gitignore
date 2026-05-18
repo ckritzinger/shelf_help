@@ -21,3 +21,4 @@ app/public/manifest.json
 # logs
 *.log
 npm-debug.log*
+.vercel
