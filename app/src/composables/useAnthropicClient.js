@@ -1,7 +1,8 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { useApiKey } from './useApiKey'
 
-const MODEL = 'claude-sonnet-4-6'
+const MODEL_SONNET = 'claude-sonnet-4-6'
+const MODEL_HAIKU = 'claude-haiku-4-5-20251001'
 
 export function useAnthropicClient() {
   const { apiKey } = useApiKey()
@@ -13,11 +14,11 @@ export function useAnthropicClient() {
     })
   }
 
-  async function sendMessage({ systemPrompt, messages, maxTokens = 800, onChunk }) {
+  async function sendMessage({ systemPrompt, messages, maxTokens = 800, onChunk, model }) {
     const client = createClient()
 
     const stream = await client.messages.stream({
-      model: MODEL,
+      model: model || MODEL_SONNET,
       max_tokens: maxTokens,
       system: systemPrompt,
       messages,

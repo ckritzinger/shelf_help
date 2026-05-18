@@ -34,7 +34,6 @@ export function useAppState() {
     state.selectedThinkerId = null
     state.conversationHistory = []
     state.visibleMessageCount = 0
-    state.thinkerRecommendations = []
     state.stage = 'thinkerSelect'
     state.error = null
   }

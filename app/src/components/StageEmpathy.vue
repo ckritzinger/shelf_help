@@ -58,13 +58,43 @@ async function callEmpathyApi() {
 
 async function confirm() {
   confirming.value = true
+  error.value = ''
   try {
     state.empathyHistory.push({ role: 'user', content: "Yes, you've got it." })
-    await callEmpathyApi()
-    const { yamlText, parsed } = parseSummary(lastAssistantMessage.value)
-    state.summaryYaml = yamlText
-    state.summaryParsed = parsed
-    await loadThinkers()
+
+    const systemPrompt = await fetchPrompt('empathy')
+    let fullResponse = ''
+    let thinkerPromise = null
+
+    await sendMessage({
+      systemPrompt,
+      messages: state.empathyHistory,
+      maxTokens: 600,
+      onChunk: (text) => {
+        fullResponse = text
+        // Kick off thinker loading the moment </summary> arrives — don't wait for stream to finish
+        if (!thinkerPromise && text.includes('</summary>')) {
+          const { yamlText, parsed } = parseSummary(text)
+          if (yamlText) {
+            state.summaryYaml = yamlText
+            state.summaryParsed = parsed
+            thinkerPromise = loadThinkers()
+          }
+        }
+      },
+    })
+
+    state.empathyHistory.push({ role: 'assistant', content: fullResponse })
+
+    // Fallback if </summary> never appeared mid-stream
+    if (!thinkerPromise) {
+      const { yamlText, parsed } = parseSummary(fullResponse)
+      state.summaryYaml = yamlText
+      state.summaryParsed = parsed
+      thinkerPromise = loadThinkers()
+    }
+
+    await thinkerPromise
     setStage('thinkerSelect')
   } catch (e) {
     error.value = e?.message || 'Something went wrong. Try again.'

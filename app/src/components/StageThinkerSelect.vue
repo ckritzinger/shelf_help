@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAppState } from '../composables/useAppState'
 import { useThinkerLoader } from '../composables/useThinkerLoader'
 import ThinkerCard from './ThinkerCard.vue'
@@ -10,6 +10,20 @@ const { loadThinkers } = useThinkerLoader()
 
 const isLoading = ref(false)
 const error = ref('')
+const showMore = ref(false)
+
+const recommendedIds = computed(() => new Set(state.thinkerRecommendations.map(t => t.id)))
+
+const otherThinkers = computed(() =>
+  Object.entries(state.allThinkerProfiles)
+    .filter(([id]) => !recommendedIds.value.has(id))
+    .map(([id, profile]) => ({
+      id,
+      name: profile.thinker.name,
+      tagline: profile.thinker.tagline,
+      whyRelevant: '',
+    }))
+)
 
 function selectThinker(id) {
   state.selectedThinkerId = id
@@ -54,6 +68,31 @@ onMounted(() => {
           v-bind="t"
           @select="selectThinker"
         />
+
+        <div v-if="otherThinkers.length" class="pt-2">
+          <button
+            @click="showMore = !showMore"
+            class="w-full flex items-center justify-center gap-2 py-2 text-warm-400 text-sm hover:text-warm-600 transition-colors"
+          >
+            <svg
+              class="w-4 h-4 transition-transform duration-200"
+              :class="showMore ? 'rotate-180' : ''"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+            {{ showMore ? 'Hide' : 'More thinkers' }}
+          </button>
+
+          <div v-if="showMore" class="space-y-4 mt-3">
+            <ThinkerCard
+              v-for="t in otherThinkers"
+              :key="t.id"
+              v-bind="t"
+              @select="selectThinker"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </div>
