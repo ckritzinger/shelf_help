@@ -1,0 +1,13 @@
+{
+  "name": "shelf-help-root",
+  "private": true,
+  "scripts": {
+    "prepare:assets": "node scripts/prepare-assets.js",
+    "dev": "npm run prepare:assets && npm --prefix app run dev",
+    "build": "npm run prepare:assets && npm --prefix app run build",
+    "preview": "npm --prefix app run preview"
+  },
+  "devDependencies": {
+    "js-yaml": "^4.1.0"
+  }
+}
