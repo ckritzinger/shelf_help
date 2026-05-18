@@ -1,10 +1,31 @@
 <script setup>
-import { ref, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useAppState } from '../composables/useAppState'
 import { useWhisper } from '../composables/useWhisper'
 
 const { state, setStage } = useAppState()
 const { modelReady, transcribe } = useWhisper()
+
+const thinkerList = computed(() =>
+  Object.values(state.allThinkerProfiles).map(p => p.thinker.name)
+)
+
+const cycleIndex = ref(0)
+const cycleVisible = ref(true)
+let cycleTimer = null
+
+function startCycle() {
+  cycleTimer = setInterval(() => {
+    cycleVisible.value = false
+    setTimeout(() => {
+      cycleIndex.value = (cycleIndex.value + 1) % (thinkerList.value.length || 1)
+      cycleVisible.value = true
+    }, 400)
+  }, 2200)
+}
+
+onMounted(() => startCycle())
+onUnmounted(() => clearInterval(cycleTimer))
 
 const rant = ref('')
 const recording = ref(false)
@@ -55,7 +76,15 @@ onUnmounted(() => { mediaRecorder?.stop() })
   <div class="flex flex-col items-center justify-center min-h-[calc(100vh-65px)] px-4 py-12">
     <div class="w-full max-w-xl">
       <h1 class="font-serif text-3xl text-warm-800 mb-2 text-center">What's going on?</h1>
-      <p class="text-warm-500 text-center mb-8 text-sm">Take your time. No judgment here.</p>
+      <div class="text-center mb-8">
+        <p class="text-warm-600 text-sm mb-2">Share what's on your mind and get perspective from:</p>
+        <div class="h-6 flex items-center justify-center">
+          <span
+            class="font-medium text-warm-700 text-sm transition-opacity duration-300"
+            :class="cycleVisible ? 'opacity-100' : 'opacity-0'"
+          >{{ thinkerList[cycleIndex] }}</span>
+        </div>
+      </div>
 
       <!-- Listening state -->
       <div v-if="recording" class="flex flex-col items-center gap-6 py-12">
