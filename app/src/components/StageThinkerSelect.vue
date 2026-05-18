@@ -1,75 +1,29 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import jsYaml from 'js-yaml'
 import { useAppState } from '../composables/useAppState'
-import { useAnthropicClient } from '../composables/useAnthropicClient'
-import { fetchPrompt } from '../composables/useManifest'
-import { parseThinkerResponse } from '../utils/parseThinkerResponse'
+import { useThinkerLoader } from '../composables/useThinkerLoader'
 import ThinkerCard from './ThinkerCard.vue'
 import LoadingSpinner from './LoadingSpinner.vue'
 
 const { state, setStage } = useAppState()
-const { sendMessage } = useAnthropicClient()
+const { loadThinkers } = useThinkerLoader()
 
 const isLoading = ref(false)
 const error = ref('')
-const rawResponse = ref('')
-
-async function buildSelectorPrompt() {
-  const template = await fetchPrompt('selector')
-
-  const thinkerBlocks = Object.entries(state.allThinkerProfiles)
-    .map(([, profile]) => {
-      const yamlContent = jsYaml.dump(profile)
-      return `<thinker>\n${yamlContent}\n</thinker>`
-    })
-    .join('\n\n')
-
-  return template
-    .replace('{{SUMMARY}}', state.summaryYaml)
-    .replace('{{THINKER_BLOCKS}}', thinkerBlocks)
-}
 
 function selectThinker(id) {
   state.selectedThinkerId = id
   setStage('conversation')
 }
 
-// Build cards from all profiles as fallback
-function allThinkerCards() {
-  return Object.entries(state.allThinkerProfiles).map(([id, profile]) => ({
-    id,
-    name: profile.thinker.name,
-    tagline: profile.thinker.tagline,
-    whyRelevant: '',
-  }))
-}
-
 async function load() {
   isLoading.value = true
   error.value = ''
-  rawResponse.value = ''
-
   try {
-    const systemPrompt = await buildSelectorPrompt()
-    let response = ''
-    await sendMessage({
-      systemPrompt,
-      messages: [{ role: 'user', content: 'Please recommend thinkers for this situation.' }],
-      maxTokens: 600,
-      onChunk: (text) => { response = text },
-    })
-
-    rawResponse.value = response
-    console.log('[selector] raw response:', response)
-
-    const parsed = parseThinkerResponse(response, state.allThinkerProfiles)
-    console.log('[selector] parsed cards:', parsed)
-
-    state.thinkerRecommendations = parsed.length > 0 ? parsed : allThinkerCards()
+    await loadThinkers()
   } catch (e) {
-    console.error('[selector] error:', e)
     error.value = e?.message || 'Something went wrong. Try again.'
+    alert(error.value)
   } finally {
     isLoading.value = false
   }

@@ -3,6 +3,7 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import { useAppState } from '../composables/useAppState'
 import { useAnthropicClient } from '../composables/useAnthropicClient'
 import { buildSystemPrompt } from '../utils/buildSystemPrompt'
+import { sanitizeText } from '../utils/sanitizeText'
 import LoadingSpinner from './LoadingSpinner.vue'
 
 const { state } = useAppState()
@@ -63,6 +64,7 @@ async function send() {
     streamingText.value = ''
   } catch (e) {
     state.error = 'Something went wrong. Try sending again.'
+    alert(state.error)
     // Remove the user message we just added so they can retry
     state.conversationHistory.pop()
     input.value = text
@@ -112,6 +114,7 @@ onMounted(async () => {
     streamingText.value = ''
   } catch (e) {
     state.error = 'Something went wrong starting the conversation.'
+    alert(state.error)
   } finally {
     isStreaming.value = false
     await scrollToBottom()
@@ -139,7 +142,7 @@ onMounted(async () => {
                   : 'bg-white border border-warm-200 text-warm-900 rounded-bl-sm shadow-sm'
               ]"
             >
-              <p class="whitespace-pre-wrap">{{ msg.content }}</p>
+              <p class="whitespace-pre-wrap">{{ msg.role === 'assistant' ? sanitizeText(msg.content) : msg.content }}</p>
             </div>
           </div>
         </template>
@@ -149,7 +152,7 @@ onMounted(async () => {
           <div class="max-w-[85%] px-4 py-3 rounded-2xl rounded-bl-sm bg-white border border-warm-200 text-warm-900 shadow-sm text-sm leading-relaxed">
             <LoadingSpinner v-if="!streamingText" />
             <template v-else>
-              <p class="whitespace-pre-wrap">{{ streamingText }}</p>
+              <p class="whitespace-pre-wrap">{{ sanitizeText(streamingText) }}</p>
               <span class="inline-block w-1 h-3.5 ml-0.5 bg-warm-400 animate-pulse align-middle" />
             </template>
           </div>

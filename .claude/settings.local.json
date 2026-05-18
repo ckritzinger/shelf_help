@@ -6,7 +6,8 @@
       "Bash(npm *)",
       "Bash(curl -s http://localhost:5173)",
       "Bash(curl -s http://localhost:5177)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(xargs ls)"
     ]
   }
 }

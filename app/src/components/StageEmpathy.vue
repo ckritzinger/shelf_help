@@ -4,16 +4,20 @@ import { useAppState } from '../composables/useAppState'
 import { useAnthropicClient } from '../composables/useAnthropicClient'
 import { fetchPrompt } from '../composables/useManifest'
 import { parseSummary, stripSummaryFromStream } from '../utils/parseSummary'
+import { sanitizeText } from '../utils/sanitizeText'
+import { useThinkerLoader } from '../composables/useThinkerLoader'
 import LoadingSpinner from './LoadingSpinner.vue'
 
 const { state, setStage } = useAppState()
 const { sendMessage } = useAnthropicClient()
+const { loadThinkers } = useThinkerLoader()
 
 const clarifying = ref(false)
 const clarification = ref('')
 const isStreaming = ref(false)
 const streamingText = ref('')
 const error = ref('')
+const confirming = ref(false)
 
 const lastAssistantMessage = computed(() => {
   const msgs = state.empathyHistory.filter(m => m.role === 'assistant')
@@ -22,7 +26,7 @@ const lastAssistantMessage = computed(() => {
 
 const displayText = computed(() => {
   const text = isStreaming.value ? streamingText.value : lastAssistantMessage.value
-  return stripSummaryFromStream(text)
+  return sanitizeText(stripSummaryFromStream(text))
 })
 
 async function callEmpathyApi() {
@@ -46,16 +50,27 @@ async function callEmpathyApi() {
     streamingText.value = ''
   } catch (e) {
     error.value = `Something went wrong: ${e?.message || 'Check your API key and try again.'}`
+    alert(error.value)
   } finally {
     isStreaming.value = false
   }
 }
 
 async function confirm() {
-  const { yamlText, parsed } = parseSummary(lastAssistantMessage.value)
-  state.summaryYaml = yamlText
-  state.summaryParsed = parsed
-  setStage('thinkerSelect')
+  confirming.value = true
+  try {
+    state.empathyHistory.push({ role: 'user', content: "Yes, you've got it." })
+    await callEmpathyApi()
+    const { yamlText, parsed } = parseSummary(lastAssistantMessage.value)
+    state.summaryYaml = yamlText
+    state.summaryParsed = parsed
+    await loadThinkers()
+    setStage('thinkerSelect')
+  } catch (e) {
+    error.value = e?.message || 'Something went wrong. Try again.'
+    alert(error.value)
+    confirming.value = false
+  }
 }
 
 async function sendClarification() {
@@ -75,7 +90,14 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-col items-center justify-center min-h-[calc(100vh-65px)] px-4 py-12">
-    <div class="w-full max-w-xl">
+
+    <!-- Full-screen loading while running both APIs after confirmation -->
+    <div v-if="confirming" class="flex flex-col items-center gap-4 text-center">
+      <LoadingSpinner />
+      <p class="text-warm-600 text-sm">Finding the right thinkers for you...</p>
+    </div>
+
+    <div v-else class="w-full max-w-xl">
       <div class="px-2 py-2 mb-6 min-h-[8rem] flex items-start">
         <div class="w-full">
           <LoadingSpinner v-if="isStreaming && !displayText" />
@@ -140,6 +162,6 @@ onMounted(() => {
           </div>
         </div>
       </div>
-    </div>
+    </div><!-- end v-else -->
   </div>
 </template>

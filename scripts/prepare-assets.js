@@ -34,33 +34,26 @@ for (const dirName of thinkerDirs) {
   const yamlPath = path.join(therapistsDir, dirName, 'profile.yaml')
   if (!fs.existsSync(yamlPath)) continue
 
-  const raw = fs.readFileSync(yamlPath, 'utf8')
+  let raw = fs.readFileSync(yamlPath, 'utf8')
 
-  // Extract all ```yaml blocks
-  const blocks = []
-  const blockRegex = /```yaml\n([\s\S]+?)```/g
-  let match
-  while ((match = blockRegex.exec(raw)) !== null) {
-    try {
-      const parsed = jsYaml.load(match[1])
-      if (parsed && parsed.thinker) blocks.push(parsed)
-    } catch {
-      // skip malformed blocks
-    }
+  // Strip optional ```yaml ... ``` fences
+  const fenceMatch = raw.match(/```yaml\s*\n([\s\S]+?)```/)
+  if (fenceMatch) raw = fenceMatch[1]
+
+  // Replace em dashes with commas
+  raw = raw.replace(/—/g, ',')
+
+  let profile
+  try {
+    profile = jsYaml.load(raw)
+  } catch (e) {
+    console.warn(`  SKIP ${dirName}: YAML parse error — ${e.message.split('\n')[0]}`)
+    continue
   }
 
-  if (blocks.length === 0) continue
-
-  // If multiple docs, find the one matching this directory (by id or name similarity)
-  let profile = blocks[0]
-  if (blocks.length > 1) {
-    const normalized = dirName.toLowerCase().replace(/_/g, ' ')
-    const found = blocks.find(b => {
-      const id = (b.thinker.id || '').toLowerCase().replace(/_/g, ' ')
-      const name = (b.thinker.name || '').toLowerCase()
-      return normalized.includes(id.split(' ')[0]) || name.split(' ').some(w => normalized.includes(w))
-    })
-    if (found) profile = found
+  if (!profile || !profile.thinker) {
+    console.warn(`  SKIP ${dirName}: no 'thinker' key found`)
+    continue
   }
 
   // Write clean YAML (no fences) to app/public

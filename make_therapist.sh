@@ -20,6 +20,6 @@ PROMPT="$(sed "s/{{THINKER_NAME}}/$THINKER_NAME/g" "$PROMPT_FILE")"
 echo "Generating profile for: $THINKER_NAME"
 echo "Output: $OUTPUT_FILE"
 
-claude --model claude-opus-4-7 -p "$PROMPT" > "$OUTPUT_FILE"
+claude --model claude-opus-4-7 --dangerously-skip-permissions -p "$PROMPT" > "$OUTPUT_FILE"
 
 echo "Done."
