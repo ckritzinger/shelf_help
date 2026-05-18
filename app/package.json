@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
+    "@huggingface/transformers": "^4.2.0",
     "js-yaml": "^4.1.0",
     "vue": "^3.4.0"
   },
