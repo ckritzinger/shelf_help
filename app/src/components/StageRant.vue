@@ -100,7 +100,7 @@ onUnmounted(() => { mediaRecorder?.stop() })
             </svg>
           </button>
         </div>
-        <p class="text-warm-600 text-sm">Listening — tap to stop.</p>
+        <p class="text-warm-600 text-sm">Listening, tap to stop.</p>
       </div>
 
       <!-- Transcribing state -->

@@ -20,7 +20,7 @@ function submit() {
     <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
       <h2 class="font-serif text-2xl text-warm-900 mb-2">Welcome to Shelf Help</h2>
       <p class="text-warm-700 mb-6 leading-relaxed">
-        To get started, you'll need an Anthropic API key. It's stored only in your browser — never sent anywhere else.
+        To get started, you'll need an Anthropic API key. It's stored only in your browser, never sent anywhere else.
       </p>
 
       <form @submit.prevent="submit" class="space-y-4">

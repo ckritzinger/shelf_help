@@ -163,7 +163,7 @@ onMounted(() => {
             @click="clarifying = true"
             class="flex-1 bg-warm-100 text-warm-800 font-medium py-3 rounded-xl hover:bg-warm-200 transition-colors border border-warm-200"
           >
-            Not quite — let me clarify
+            Not quite, let me clarify
           </button>
         </div>
 

@@ -8,6 +8,7 @@
     "preview": "npm --prefix app run preview"
   },
   "devDependencies": {
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "sharp": "^0.34.5"
   }
 }

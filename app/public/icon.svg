@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Warm background -->
+  <rect width="512" height="512" rx="90" fill="#7d5448"/>
+
+  <!-- Left page -->
+  <path d="M 88 168 C 140 152 196 148 244 152 L 244 364 C 196 360 140 364 88 380 Z" fill="#f0e2da"/>
+
+  <!-- Right page -->
+  <path d="M 268 152 C 316 148 372 152 424 168 L 424 380 C 372 364 316 360 268 364 Z" fill="#faf3ef"/>
+
+  <!-- Spine shadow left -->
+  <path d="M 244 152 L 256 156 L 256 368 L 244 364 Z" fill="#c9a090"/>
+
+  <!-- Spine -->
+  <rect x="254" y="148" width="4" height="220" fill="#b07f6e"/>
+
+  <!-- Spine shadow right -->
+  <path d="M 258 156 L 268 152 L 268 364 L 258 368 Z" fill="#dbb8aa"/>
+
+  <!-- Text lines left page -->
+  <line x1="108" y1="216" x2="234" y2="212" stroke="#c9a090" stroke-width="10" stroke-linecap="round" opacity="0.55"/>
+  <line x1="108" y1="248" x2="234" y2="244" stroke="#c9a090" stroke-width="10" stroke-linecap="round" opacity="0.55"/>
+  <line x1="108" y1="280" x2="234" y2="276" stroke="#c9a090" stroke-width="10" stroke-linecap="round" opacity="0.55"/>
+  <line x1="108" y1="312" x2="200" y2="308" stroke="#c9a090" stroke-width="10" stroke-linecap="round" opacity="0.35"/>
+
+  <!-- Text lines right page -->
+  <line x1="278" y1="212" x2="404" y2="216" stroke="#c9a090" stroke-width="10" stroke-linecap="round" opacity="0.55"/>
+  <line x1="278" y1="244" x2="404" y2="248" stroke="#c9a090" stroke-width="10" stroke-linecap="round" opacity="0.55"/>
+  <line x1="278" y1="276" x2="404" y2="280" stroke="#c9a090" stroke-width="10" stroke-linecap="round" opacity="0.55"/>
+  <line x1="278" y1="308" x2="360" y2="312" stroke="#c9a090" stroke-width="10" stroke-linecap="round" opacity="0.35"/>
+</svg>
