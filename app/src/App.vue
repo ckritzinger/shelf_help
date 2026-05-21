@@ -3,7 +3,6 @@ import { computed, onMounted, ref } from 'vue'
 import { useApiKey } from './composables/useApiKey'
 import { useAppState } from './composables/useAppState'
 import { fetchAllThinkerProfiles } from './composables/useManifest'
-import { useWhisper } from './composables/useWhisper'
 import AppHeader from './components/AppHeader.vue'
 import ApiKeyGate from './components/ApiKeyGate.vue'
 import StageRant from './components/StageRant.vue'
@@ -20,8 +19,6 @@ function confirmChangeKey() {
   clearApiKey()
   showChangeKeyModal.value = false
 }
-const { loadModel } = useWhisper()
-
 const stageComponents = {
   rant: StageRant,
   empathy: StageEmpathy,
@@ -37,8 +34,6 @@ onMounted(async () => {
   } catch (e) {
     state.error = 'Failed to load thinker profiles. Is the dev server running?'
   }
-  // Background — don't await, mic appears when ready
-  loadModel()
 })
 </script>
 
