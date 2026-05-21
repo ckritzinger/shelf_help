@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useAppState } from '../composables/useAppState'
 
 const { state, setStage } = useAppState()
@@ -26,17 +26,20 @@ onMounted(() => startCycle())
 onUnmounted(() => clearInterval(cycleTimer))
 
 const RANT_KEY = 'shelf_help_rant_draft'
-const rant = ref(sessionStorage.getItem(RANT_KEY) || '')
-watch(rant, (v) => {
-  if (v) sessionStorage.setItem(RANT_KEY, v)
-  else sessionStorage.removeItem(RANT_KEY)
-})
+const rant = ref(localStorage.getItem(RANT_KEY) || '')
+
+function onRantInput(e) {
+  const v = e.target.value
+  rant.value = v
+  if (v) localStorage.setItem(RANT_KEY, v)
+  else localStorage.removeItem(RANT_KEY)
+}
 
 function submit() {
   if (!rant.value.trim()) return
   state.empathyHistory = [{ role: 'user', content: rant.value.trim() }]
   state.error = null
-  sessionStorage.removeItem(RANT_KEY)
+  localStorage.removeItem(RANT_KEY)
   setStage('empathy')
 }
 </script>
@@ -55,22 +58,24 @@ function submit() {
         </div>
       </div>
 
-      <form @submit.prevent="submit" class="space-y-4">
+      <div class="space-y-4">
         <textarea
-          v-model="rant"
+          :value="rant"
+          @input="onRantInput"
           rows="8"
           placeholder="Start wherever feels right..."
           class="w-full px-5 py-4 rounded-2xl border border-warm-200 bg-white text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-warm-300 resize-none text-base leading-relaxed shadow-sm"
         />
 
         <button
-          type="submit"
+          type="button"
           :disabled="!rant.trim()"
+          @click="submit"
           class="w-full bg-warm-700 text-warm-50 font-medium py-3 rounded-xl hover:bg-warm-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Tell me about it
         </button>
-      </form>
+      </div>
     </div>
   </div>
 </template>
